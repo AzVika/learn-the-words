@@ -26,6 +26,10 @@ class Card extends React.Component {
         });
     }
 
+    hangleDeleteClick = () => {
+        this.props.onDeleted();
+    }
+
     render() {
         const {eng, rus} = this.props;
         const { done, isRemembered } = this.state;
@@ -52,7 +56,7 @@ class Card extends React.Component {
                     <CheckSquareOutlined onClick={this.handleIsRememberClick} />
                 </div>
                 <div className={cl(s.icons, s.deleted)}>
-                    <DeleteOutlined />
+                    <DeleteOutlined onClick={this.hangleDeleteClick} />
                 </div>
             </div>
         )

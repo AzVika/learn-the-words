@@ -4,8 +4,9 @@ import Card from '../Card';
 import s from './CardList.module.scss';
 
 class CardList extends Component {
+
     render() {
-        const { items } = this.props;
+        const { items = [], onDeletedItem } = this.props;
         
         return (
             <>
@@ -16,6 +17,7 @@ class CardList extends Component {
                                 key={id}
                                 eng={eng}
                                 rus={rus}
+                                onDeleted={() => onDeletedItem(id)}
                             />
                         ))
                     }
