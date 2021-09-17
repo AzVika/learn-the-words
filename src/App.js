@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import { ClockCircleOutlined, HomeOutlined, SmileOutlined } from '@ant-design/icons';
+import { Input } from 'antd';
 
 import BackgroundBlock from './components/BackgroundBlock';
 import Button from './components/Button';
@@ -10,117 +11,85 @@ import Header from './components/Header';
 import Paragraph from './components/Paragraph';
 import Section from './components/Section';
 
+import getTraslateWord from './services/dictionary';
+import database from './services/firebase';
+
 import firstBackground from './assets/background.jpg';
 import secondBackground from './assets/back2.jpg';
 
 import s from './App.module.scss';
 
-const wordsList = [
-  {
-      id: '1',
-      eng: 'between',
-      rus: 'между'
-  },
-  {
-      id: '2',
-      eng: 'high',
-      rus: 'высокий'
-  },
-  {
-      id: '3',
-      eng: 'really',
-      rus: 'действительно'
-  },
-  {
-      id: '4',
-      eng: 'something',
-      rus: 'что-нибудь'
-  },
-  {
-      id: '5',
-      eng: 'most',
-      rus: 'большинство'
-  },
-  {
-      id: '6',
-      eng: 'another',
-      rus: 'другой'
-  },
-  {
-      id: '7',
-      eng: 'much',
-      rus: 'много'
-  },
-  {
-      id: '8',
-      eng: 'family',
-      rus: 'семья'
-  },
-  {
-      id: '9',
-      eng: 'own',
-      rus: 'личный'
-  },
-  {
-      id: '10',
-      eng: 'out',
-      rus: 'из/вне'
-  },
-  {
-      id: '11',
-      eng: 'leave',
-      rus: 'покидать'
-  },
-  {
-      id: '12',
-      eng: 'width',
-      rus: 'широкий'
-  },
-];
-
+const { Search } = Input;
 
 class App extends Component {
 
   state = {
-    wordArr: wordsList,
+    wordsArr: [],
     value: '',
-    label: ''
+    label: '',
+    isBusy: false,
   }
 
   inputRef = React.createRef();
 
   handleDeletedItem = (id) => {
-    this.setState( ({ wordArr }) => {
-      const idx = wordArr.findIndex(item => item.id === id);
+    this.setState( ({ wordsArr }) => {
+      const idx = wordsArr.findIndex(item => item.id === id);
       const newWordArr = [
-        ...wordArr.slice(0, idx),
-        ...wordArr.slice(idx + 1)
+        ...wordsArr.slice(0, idx),
+        ...wordsArr.slice(idx + 1)
       ]
       return {
-        wordArr: newWordArr
+        wordsArr: newWordArr
       }
     });
   }
 
-  handleImputChange = (e) => {
+  handleInputChange = (e) => {
     this.setState({
-        value: e.target.value
-    })
-    console.log(e.target.value);
+        value: e.target.value,
+    });
   }
 
-  handeSubmitForm = (e) => {
-      e.preventDefault();
-      this.setState( ({value}) => {
-          return {
-              label: value,
-              value: ''
-          }
-      });
+  getTheWord = async () => {
+    
+    const { value } = this.state;
+    const getWord = await getTraslateWord(value);
+    
+    console.log(getWord);
+
+    this.setState({
+        label: `${value} - ${getWord.translate}`,
+        value: '',
+        isBusy: false,
+    });
+  }
+
+  handeSubmitForm = async () => {
+      this.setState({
+          isBusy: true,
+      }, this.getTheWord);
+  }
+
+  componentDidMount() {
+    database.ref('/cards').once('value').then(res => {
+        this.setState({
+            wordsArr: res.val(),
+        });
+    });
+  }
+
+  setNewWord = () => {
+      const { wordsArr } = this.state;
+      database.ref('/cards').set([...wordsArr, {
+          id: +new Date(),
+          eng: 'mouse',
+          rus: 'мышь',
+      }]);
   }
 
   render() {
-    const { wordArr } = this.state;
+    const { value, label, isBusy, wordsArr } = this.state;
 
     return (
       <>
@@ -184,8 +153,20 @@ class App extends Component {
                   Клика по карточкам и узнавай новые слова, быстро и легко!
               </Paragraph>
 
-              <div>{this.state.label}</div>
-              <form 
+              <div>{label}</div>
+              <form className={s.form}>
+                <Search
+                    placeholder="input search text"
+                    allowClear
+                    enterButton="Search"
+                    size="large"
+                    value={value}
+                    loading={isBusy}
+                    onChange={this.handleInputChange}
+                    onSearch={this.handeSubmitForm}
+                />
+              </form>
+              {/* <form 
                   className={s.form}
                   onSubmit={this.handeSubmitForm}
               >
@@ -198,10 +179,10 @@ class App extends Component {
                   <button>
                       Add new word
                   </button>
-              </form>
+              </form> */}
 
               <CardList 
-                  items={wordArr}
+                  items={wordsArr}
                   onDeletedItem={this.handleDeletedItem}
               />
           </Section>
