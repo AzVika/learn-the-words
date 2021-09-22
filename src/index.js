@@ -6,4 +6,7 @@ import App from './App';
 import 'antd/dist/antd.css';
 import './index.css';
 
-ReactDom.render(<App />, document.getElementById('root'));
+import FirebaseContext from './context/firebaseContext';
+import Firebase from './services/firebase';
+
+ReactDom.render(<FirebaseContext.Provider value={new Firebase()}><App /></FirebaseContext.Provider>, document.getElementById('root'));
