@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
 
-import database from '../../services/firebase';
 import FirebaseContext from '../../context/firebaseContext';
 
 import { ClockCircleOutlined, HomeOutlined, SmileOutlined } from '@ant-design/icons';
-import { Input } from 'antd';
 
 import BackgroundBlock from '../../components/BackgroundBlock';
 import Button from '../../components/Button';
@@ -14,82 +12,25 @@ import Header from '../../components/Header';
 import Paragraph from '../../components/Paragraph';
 import Section from '../../components/Section';
 
-import getTraslateWord from '../../services/dictionary';
-
 import firstBackground from '../../assets/background.jpg';
 import secondBackground from '../../assets/back2.jpg';
 
 import s from './Home.module.scss';
 
-const { Search } = Input;
-
-const inputRef = React.createRef();
+// const inputRef = React.createRef();
 
 class HomePage extends Component {
 
     state = {
-        wordsArr: [],
-        value: '',
-        label: '',
-        isBusy: false,
+        // wordsArr: [],
     }
-
-    urlRequest = `/cards/${this.props.user.uid}`;
 
     componentDidMount() {
-        const { getUserCardRef } = this.context;
-        getUserCardRef().on('value', res => {
-            this.setState({
-                wordsArr: res.val() || [],
-            });
-        });
-    }
-
-    handleDeletedItem = (id) => {
-        const { wordsArr } = this.state;
-        const newWordArr = wordsArr.filter(item => item.id !== id);
-
-        // database.ref(this.urlRequest).set(newWordArr);
-    }
-
-    handleInputChange = (e) => {
-        this.setState({
-            value: e.target.value,
-        });
-    }
-
-    getTheWord = async () => {
-
-        const { value } = this.state;
-        const getWord = await getTraslateWord(value);
-
-        console.log(getWord);
-
-        this.setState({
-            label: `${value} - ${getWord.translate}`,
-            value: '',
-            isBusy: false,
-        });
-    }
-
-    handeSubmitForm = async () => {
-        this.setState({
-            isBusy: true,
-        }, this.getTheWord);
-    }
-
-    setNewWord = () => {
-        const { wordsArr } = this.state;
-        // database.ref(this.urlRequest).set([...wordsArr, {
-        //     id: +new Date(),
-        //     eng: 'mouse',
-        //     rus: 'мышь',
-        // }]);
+        
     }
 
     render() {
-        const { value, label, isBusy, wordsArr } = this.state;
-        console.log(this.props.user.uid);
+
         return (
             <>
                 <BackgroundBlock
@@ -151,39 +92,7 @@ class HomePage extends Component {
                     <Paragraph>
                         Клика по карточкам и узнавай новые слова, быстро и легко!
                     </Paragraph>
-
-                    <div>{label}</div>
-                    <form className={s.form}>
-                        <Search
-                            placeholder="input search text"
-                            allowClear
-                            enterButton="Search"
-                            size="large"
-                            value={value}
-                            loading={isBusy}
-                            onChange={this.handleInputChange}
-                            onSearch={this.handeSubmitForm}
-                        />
-                    </form>
-                    {/* <form 
-                      className={s.form}
-                      onSubmit={this.handeSubmitForm}
-                  >
-                      <input 
-                          ref={this.inputRef}
-                          type="text"
-                          value={this.state.value}
-                          onChange={this.handleImputChange}
-                      />
-                      <button>
-                          Add new word
-                      </button>
-                  </form> */}
-
-                    <CardList
-                        items={wordsArr}
-                        onDeletedItem={this.handleDeletedItem}
-                    />
+                    <CardList />
                 </Section>
                 <BackgroundBlock
                     backgroundImg={secondBackground}

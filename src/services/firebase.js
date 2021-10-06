@@ -12,7 +12,6 @@ const firebaseConfig = {
     appId: process.env.REACT_APP_FB_APP_ID,
 };
 
-
 class Firebase {
     constructor() {
         firebase.initializeApp(firebaseConfig);
@@ -27,7 +26,11 @@ class Firebase {
 
     signWithEmail = (email, password) => this.auth.signInWithEmailAndPassword(email, password);
 
+    // signOut = this.auth.signOut();
+
     getUserCardRef = (uid) => this.database.ref(`/cards/${this.userUid}`);
+
+    getUserCurrentCardRef = (id) => this.database.ref(`/cards/${this.userUid}/${id}`);
 }
 
 // export const fire = firebase;

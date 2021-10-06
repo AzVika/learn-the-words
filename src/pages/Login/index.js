@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import { Layout, Form, Input, Button } from 'antd';
 
-import { fire } from '../../services/firebase';
-
 import FirebaseContext from '../../context/firebaseContext';
 
 import s from './Login.module.scss';
@@ -12,10 +10,13 @@ const { Content } = Layout;
 class LoginPage extends Component {
 
     onFinish = ({ email, password }) => {
-        const { signWithEmail } = this.context;
+        const { signWithEmail, setUserUid } = this.context;
+        const { history } = this.props;
         signWithEmail(email, password)
             .then(res => {
-                console.log(res)
+                setUserUid(res.user.uid);
+                localStorage.setItem('user', res.user.uid);
+                history.push('/');
             });
     };
 

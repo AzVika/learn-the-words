@@ -1,48 +1,27 @@
 import React, { Component } from 'react';
-import Card from '../Card';
-import { Spin, Input } from 'antd';
+
+import { Input } from 'antd';
 
 import FirebaseContext from '../../context/firebaseContext';
 
 import getTraslateWord from '../../services/dictionary';
 
-import s from './CardList.module.scss';
+import s from './FormSearch.module.scss';
 
 const { Search } = Input;
 
+const inputRef = React.createRef();
 
-class CardList extends Component {
+class FormSearch extends Component {
 
     state = {
         wordsArr: [],
         value: '',
-        label: '',
+        label: 'sfsdfsdfsdfs',
         isBusy: false,
     }
 
-    componentDidMount() {
-        const { getUserCardRef } = this.context;
-
-        getUserCardRef().on('value', res => {
-            console.log(3);
-            if(res.val() !== null) {
-                this.setState({
-                    wordsArr: res.val(),
-                });
-            }
-                    
-            console.log(res.val());
-        });
-    }
-
-    handleDeletedItem = (id) => {
-        const { wordsArr } = this.state;
-        const { getUserCardRef } = this.context;
-        const newWorsdArr = wordsArr.filter(item => item.id !== id);
-
-        getUserCardRef().set(newWorsdArr);
-        console.log('delete word');
-    }
+    
 
     getTheWord = async () => {
 
@@ -99,10 +78,10 @@ class CardList extends Component {
         }
     }
 
-
     render() {
-        const { wordsArr, value, label, isBusy } = this.state;
 
+        const { value, label, isBusy } = this.state;
+        
         return (
             <>
                 <div>{label}</div>
@@ -116,32 +95,28 @@ class CardList extends Component {
                         loading={isBusy}
                         onChange={this.handleInputChange}
                         onSearch={this.handeSubmitForm}
-                        // ref={inputRef}
+                        ref={inputRef}
                     />
                 </form>
-                {
-                    (wordsArr === null || wordsArr.length === 0)
-                        ? <Spin />
-                        : <div className={s.root}>
-                            {
-                                wordsArr.map(({ eng, rus, id }) => (
-                                    <Card
-                                        key={id}
-                                        eng={eng}
-                                        rus={rus}
-                                        index={id}
-                                        onDeleted={this.handleDeletedItem}
-                                    />
-                                ))
-                            }
-                        </div>
-                }
-                
+                {/* <form 
+                    className={s.form}
+                    onSubmit={this.handeSubmitForm}
+                >
+                    <input 
+                        ref={this.inputRef}
+                        type="text"
+                        value={this.state.value}
+                        onChange={this.handleImputChange}
+                    />
+                    <button>
+                        Add new word
+                    </button>
+                  </form> */}
             </>
-        );
+        )
     }
 }
 
-CardList.contextType = FirebaseContext;
+FormSearch.context = FirebaseContext;
 
-export default CardList;
+export default FormSearch;
